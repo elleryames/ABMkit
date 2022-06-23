@@ -7,20 +7,17 @@
 
 #include <string>
 
-class Agents
+class Agent
 {
-private:
+protected:
     int _id;
-    string _agent_type;
     
 public:
-    // Constructor and destructor
-    Agents(int id, string agent_type) : _id(id), _agent_type(agent_type) {};
-    ~Agents();
+    int getID() { return _id; }
 
     // run: interaction between agent and other agents.
     // pure virtual method, must be overwritten by derived classes for specific agents. 
-    virtual void run() = 0;
+    // virtual void run() = 0;
 };
 
 

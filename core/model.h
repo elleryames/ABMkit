@@ -7,12 +7,18 @@
 
 class Model
 {
-private:
-    int numBaseDimensions; // spatial or otherwise base dim
+protected:
+    int _baseDimension{2}; // base dimension of model
 
 public:
-    Model();
-    ~Model();
+    // Random number within specified range
+    // FIXME: Make template.
+    double getRandomDouble(double min, double max);
+
+    void setBaseDimension(int bD) 
+    { 
+        _baseDimension = bD; 
+    }
 
     // Set initial configuration and state of agents
     virtual void setInitialData() = 0;
