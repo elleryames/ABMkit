@@ -2,13 +2,27 @@
     An agent class
 */ 
 
-class Boids : public Agent
+#include <vector>
+
+#include "agents.h"
+
+
+class Boid : public Agent
 {
 private:
-    
+    static int _numBoids;
+    double _size;
+    std::vector<double> _position;
+    std::vector<double> _velocity;
 
 public:
-    Boids(int id);
-    ~Boids();
-    void run();
+    Boid(std::vector<double> position, 
+         std::vector<double> velocity, 
+         double size);
+    ~Boid();
+
+    double getSize();
+    std::vector<double> getPosition();
+    std::vector<double> getVelocity();
+    int getNumBoids();
 };
