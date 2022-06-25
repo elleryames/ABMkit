@@ -5,6 +5,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <random>
+
 class Model
 {
 protected:
@@ -13,7 +15,8 @@ protected:
 public:
     // Random number within specified range
     // FIXME: Make template.
-    double getRandomDouble(double min, double max);
+    template <typename T>
+    T getRandom(T min, T max);
 
     void setBaseDimension(int bD) 
     { 
@@ -26,5 +29,14 @@ public:
     // Run simulation
     virtual void runModel() = 0;
 };
+
+template <typename T>
+T Model::getRandom(T min, T max)
+{
+    std::random_device rdVec;
+    std::mt19937_64 eng(rdVec());
+    std::uniform_real_distribution<T> distr(min, max);
+    return distr(eng);
+}
 
 #endif

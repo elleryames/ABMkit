@@ -2,7 +2,7 @@
     A simulation of 2D flocking.
 */
 
-#include "flock.h"
+#include "flock/flock.h"
 #include <random>
 #include <iostream>
 
@@ -16,7 +16,7 @@ int main()
     // Initialize and run simulation
     Flock myFlock(spaceDim, flockSize, boidSize);
     myFlock.setInitialData();
-    myFlock.runModel();
+    myFlock.boidInfo();
 
     return 0;
 }

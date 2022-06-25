@@ -56,7 +56,7 @@ std::vector<T> Flock::generateRandomArray(std::vector<T> valMin, std::vector<T> 
     std::vector<T> out_arr;
     for (int i = 0; i < Flock::_baseDimension; i++)
     {
-        out_arr.push_back(Flock::getRandomDouble(valMin[i], valMax[i]));
+        out_arr.push_back(Flock::getRandom(valMin[i], valMax[i]));
     }
     return out_arr;
 }
@@ -65,11 +65,13 @@ std::vector<T> Flock::generateRandomArray(std::vector<T> valMin, std::vector<T> 
 template <typename T>
 std::string Flock::printVector(std::vector<T> vec)
 {
+    std::string strout = "";
     for (int i=0; i < vec.size(); i++)
     {
-        std::cout << vec[i] << " " 
+        strout += std::to_string(vec[i]);
+        strout += " ";
     }
-    std::cout << std::endl;
+    return strout;
 }
 
 #endif

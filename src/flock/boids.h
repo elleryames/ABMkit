@@ -19,7 +19,6 @@ public:
     Boid(std::vector<double> position, 
          std::vector<double> velocity, 
          double size);
-    ~Boid();
 
     double getSize();
     std::vector<double> getPosition();

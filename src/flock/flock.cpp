@@ -31,8 +31,8 @@ void Flock::setInitialData()
 {
     for (int i = 0; i < _flockSize; i++)
     {
-        std::vector<double> pos = generateRandomArray(_domainMin, _domainMax);
-        std::vector<double> vel = generateRandomArray(_minVel, _maxVel);
+        std::vector<double> pos = Flock::generateRandomArray(_domainMin, _domainMax);
+        std::vector<double> vel = Flock::generateRandomArray(_minVel, _maxVel);
         _boids.emplace_back(Boid(pos, vel, _boidSize));
     }
 }
@@ -44,8 +44,8 @@ void Flock::boidInfo()
               << std::endl;
     for (auto boid : _boids)
     {
-        std::cout << boid.getID()
-                  << boid.getSize()
+        std::cout << boid.getID() << " "
+                  << boid.getSize() << " "
                   << Flock::printVector(boid.getPosition())
                   << Flock::printVector(boid.getVelocity())
                   << std::endl;
