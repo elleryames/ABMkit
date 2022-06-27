@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <memory>
 
 #include "boids.h"
 #include "model.h"
@@ -27,14 +28,17 @@ private:
     // Diagonally opposed points of rectangular domain. 
     std::vector<double> _domainMin = {0,0};
     std::vector<double> _domainMax = {1,1}; 
-    std::vector<Boid> _boids; //FIXME: Instantiate on heap
+
+    // Vector of agents (boids), stored in heap.
+    std::unique_ptr< std::vector<Boid> > _boids;
 
 public:
     template <typename T>
     std::vector<T> generateRandomArray(std::vector<T> valMin, std::vector<T> valMax);
 
+    // Constructors 
+    // FIXME: provide constructors with differing arguments.
     Flock(int baseDim, int flockSize, double boidSize);
-    void evolveAgent(Boid boid);
 
     // Set bounds in position and velocity space
     void setDomain(std::vector<double> dMin, std::vector<double> dMax);
@@ -47,6 +51,7 @@ public:
 
     // inherited methods
     void setInitialData() override;
+    //void evolveAgent(Boid boid) override;
     void runModel() override;
 };
 
