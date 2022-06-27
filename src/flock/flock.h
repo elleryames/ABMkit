@@ -20,13 +20,14 @@ friend class Boid;
 private:
     int _flockSize = 2;
     double _boidSize = 0.1;
+    // FIXME: create Domain class, and instantiate on heap here.
     // Diagonal corners of rectangle in velocity space.
     std::vector<double> _minVel = {-1,-1}; 
     std::vector<double> _maxVel = {1,1};
     // Diagonally opposed points of rectangular domain. 
     std::vector<double> _domainMin = {0,0};
     std::vector<double> _domainMax = {1,1}; 
-    std::vector<Boid> _boids;
+    std::vector<Boid> _boids; //FIXME: Instantiate on heap
 
 public:
     template <typename T>
@@ -45,8 +46,8 @@ public:
     void boidInfo();
 
     // inherited methods
-    void setInitialData();
-    void runModel();
+    void setInitialData() override;
+    void runModel() override;
 };
 
 // Template function definitions 
