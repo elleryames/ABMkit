@@ -7,6 +7,8 @@
 
 #include <random>
 
+#include "agents.h"
+
 class Model
 {
 protected:
@@ -25,6 +27,10 @@ public:
 
     // Set initial configuration and state of agents
     virtual void setInitialData() = 0;
+
+    // Evolve agents
+    // FIXME
+    //virtual void evolveAgent(Agent agent) = 0;
 
     // Run simulation
     virtual void runModel() = 0;
