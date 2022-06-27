@@ -34,7 +34,8 @@ private:
 
 public:
     template <typename T>
-    std::vector<T> generateRandomArray(std::vector<T> valMin, std::vector<T> valMax);
+    const std::vector<T> generateRandomArray(const std::vector<T> valMin, 
+                                             const std::vector<T> valMax);
 
     // Constructors 
     // FIXME: provide constructors with differing arguments.
@@ -46,7 +47,7 @@ public:
 
     // print info
     template <typename T>
-    std::string printVector(std::vector<T> vec);
+    const std::string printVector(const std::vector<T>& vec);
     void boidInfo();
 
     // inherited methods
@@ -57,7 +58,8 @@ public:
 
 // Template function definitions 
 template <class T>
-std::vector<T> Flock::generateRandomArray(std::vector<T> valMin, std::vector<T> valMax)
+const std::vector<T> Flock::generateRandomArray(const std::vector<T> valMin, 
+                                                const std::vector<T> valMax)
 {
     std::vector<T> out_arr;
     for (int i = 0; i < Flock::_baseDimension; i++)
@@ -69,7 +71,7 @@ std::vector<T> Flock::generateRandomArray(std::vector<T> valMin, std::vector<T> 
 
 // Simply print components of vector separated by a space
 template <typename T>
-std::string Flock::printVector(std::vector<T> vec)
+const std::string Flock::printVector(const std::vector<T>& vec)
 {
     std::string strout = "";
     for (int i=0; i < vec.size(); i++)
