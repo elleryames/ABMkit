@@ -12,6 +12,7 @@
 
 #include "boids.h"
 #include "model.h"
+#include "domain.h"
 
 class Flock : public Model
 {
@@ -19,17 +20,14 @@ class Flock : public Model
 friend class Boid;
 
 private:
+    // Basic parameters of flock
     int _flockSize = 2;
     double _boidSize = 0.1;
-    // FIXME: create Domain class, and instantiate on heap here.
-    // Diagonal corners of rectangle in velocity space.
-    std::vector<double> _minVel = {-1,-1}; 
-    std::vector<double> _maxVel = {1,1};
-    // Diagonally opposed points of rectangular domain. 
-    std::vector<double> _domainMin = {0,0};
-    std::vector<double> _domainMax = {1,1}; 
 
-    // Vector of agents (boids), stored in heap.
+    // a domain may be shared among multiple flocks.
+    std::shared_ptr< Domain > _phaseSpace;
+
+    // container for members of flock (boids), stored in heap.
     std::unique_ptr< std::vector<Boid> > _boids;
 
 public:
@@ -42,8 +40,10 @@ public:
     Flock(int baseDim, int flockSize, double boidSize);
 
     // Set bounds in position and velocity space
-    void setDomain(std::vector<double> dMin, std::vector<double> dMax);
-    void setVelocityBounds(std::vector<double> vMin, std::vector<double> vMax);
+    void setPhaseSpace( std::vector<double> sMin, 
+                        std::vector<double> sMax, 
+                        std::vector<double> vMin, 
+                        std::vector<double> vMax);
 
     // print info
     template <typename T>

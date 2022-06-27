@@ -8,4 +8,7 @@ target_sources( ABMkit
     boids.cpp
     flock.h
     flock.cpp
+    PRIVATE
+    domain.h
+    domain.cpp
 )

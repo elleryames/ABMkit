@@ -2,40 +2,35 @@
 #include <iostream>
 #include "flock.h"
 
-Flock::Flock(int baseDim, int flockSize, double boidSize) : _flockSize(flockSize), _boidSize(boidSize) 
+Flock::Flock(int baseDim, int flockSize, double boidSize) 
+    : _flockSize(flockSize), _boidSize(boidSize) 
 {
     Flock::setBaseDimension(baseDim);
-    _boids = std::make_unique< std::vector<Boid> >();
+    _boids  = std::make_unique< std::vector<Boid> >();
+    _phaseSpace = std::make_shared< Domain >();
 };
-
-void Flock::setDomain(std::vector<double> dMin, std::vector<double> dMax)
-{
-    // Set if sensible
-    if (dMin < dMax)
-    {
-        _domainMin = dMin;
-        _domainMax = dMax;
-    }
-}
-
-void Flock::setVelocityBounds(std::vector<double> vMin, std::vector<double> vMax)
-{
-    // Set if sensible
-    if (vMin < vMax)
-    {
-        _minVel = vMin;
-        _maxVel = vMax;
-    }
-}
 
 void Flock::setInitialData()
 {
+
+    auto sDomain = _phaseSpace->getSpace();
+    auto vDomain = _phaseSpace->getVelocity();
+
     for (int i = 0; i < _flockSize; i++)
     {
-        std::vector<double> pos = Flock::generateRandomArray(_domainMin, _domainMax);
-        std::vector<double> vel = Flock::generateRandomArray(_minVel, _maxVel);
+        std::vector<double> pos = Flock::generateRandomArray(sDomain.first, sDomain.second);
+        std::vector<double> vel = Flock::generateRandomArray(vDomain.first, vDomain.second);
         _boids->emplace_back(Boid(pos, vel, _boidSize));
     }
+}
+
+
+void Flock::setPhaseSpace(  std::vector<double> sMin, 
+                            std::vector<double> sMax, 
+                            std::vector<double> vMin, std::vector<double> vMax)
+{
+    Flock::_phaseSpace->setSpace(sMin, sMax);
+    Flock::_phaseSpace->setVelocity(vMin, vMax);
 }
 
 void Flock::boidInfo()
