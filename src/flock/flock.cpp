@@ -12,14 +12,10 @@ Flock::Flock(int baseDim, int flockSize, double boidSize)
 
 void Flock::setInitialData()
 {
-
-    auto sDomain = _phaseSpace->getSpace();
-    auto vDomain = _phaseSpace->getVelocity();
-
     for (int i = 0; i < _flockSize; i++)
     {
-        std::vector<double> pos = Flock::generateRandomArray(sDomain.first, sDomain.second);
-        std::vector<double> vel = Flock::generateRandomArray(vDomain.first, vDomain.second);
+        std::vector<double> pos = Flock::generateRandomArray(_phaseSpace->_sMin, _phaseSpace->_sMax);
+        std::vector<double> vel = Flock::generateRandomArray(_phaseSpace->_vMin, _phaseSpace->_vMax);
         _boids->emplace_back(Boid(pos, vel, _boidSize));
     }
 }
