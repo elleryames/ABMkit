@@ -2,6 +2,9 @@
     An agent class
 */ 
 
+#ifndef BOIDS_H
+#define BOIDS_H
+
 #include <vector>
 
 #include "agents.h"
@@ -25,3 +28,5 @@ public:
     std::vector<double> getVelocity();
     int getNumBoids();
 };
+
+#endif
