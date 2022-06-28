@@ -12,11 +12,13 @@ int main()
     int spaceDim = 2;
     int flockSize = 6;
     double boidSize = 0.1;
+    int maxRunSteps = 2;
 
     // Initialize and run simulation
-    Flock myFlock(spaceDim, flockSize, boidSize);
+    Flock myFlock(spaceDim, flockSize, boidSize, maxRunSteps);
     myFlock.setInitialData();
-    myFlock.boidInfo();
+    myFlock.boidInfo(true);
+    myFlock.runModel();
 
     return 0;
 }

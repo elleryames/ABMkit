@@ -30,6 +30,9 @@ private:
     // container for members of flock (boids), stored in heap.
     std::unique_ptr< std::vector<Boid> > _boids;
 
+    // Flock evolution
+    int _maxRunSteps;
+
 public:
     template <typename T>
     const std::vector<T> generateRandomArray(const std::vector<T> valMin, 
@@ -37,7 +40,7 @@ public:
 
     // Constructors 
     // FIXME: provide constructors with differing arguments.
-    Flock(int baseDim, int flockSize, double boidSize);
+    Flock(int baseDim, int flockSize, double boidSize, int maxRunSteps);
 
     // Set bounds in position and velocity space
     void setPhaseSpace( std::vector<double> sMin, 
@@ -48,7 +51,13 @@ public:
     // print info
     template <typename T>
     const std::string printVector(const std::vector<T>& vec);
-    void boidInfo();
+    // print info for one boid and all boids w/wo header
+    void boidInfo(Boid& boid);
+    void boidInfo(bool print_header = false);
+
+    // Methods for evolution of agents (boids)
+    std::vector<double> computeMeanPosition();
+    std::vector<double> computeMeanHeading();
 
     // inherited methods
     void setInitialData() override;

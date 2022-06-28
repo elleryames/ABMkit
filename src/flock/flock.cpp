@@ -2,8 +2,8 @@
 #include <iostream>
 #include "flock.h"
 
-Flock::Flock(int baseDim, int flockSize, double boidSize) 
-    : _flockSize(flockSize), _boidSize(boidSize) 
+Flock::Flock(int baseDim, int flockSize, double boidSize, int maxRunSteps) 
+    : _flockSize(flockSize), _boidSize(boidSize), _maxRunSteps(maxRunSteps)
 {
     Flock::setBaseDimension(baseDim);
     _boids  = std::make_unique< std::vector<Boid> >();
@@ -29,21 +29,29 @@ void Flock::setPhaseSpace(  std::vector<double> sMin,
     Flock::_phaseSpace->setVelocity(vMin, vMax);
 }
 
-void Flock::boidInfo()
+void Flock::boidInfo(Boid& boid)
 {
-    std::cout << "Boid ID, " << "size, "
-              << "position, " << "velocity"
+    std::cout << boid.getID() << " "
+              << boid.getSize() << " "
+              << Flock::printVector(boid.getPosition())
+              << Flock::printVector(boid.getVelocity())
               << std::endl;
-    
+}
+
+void Flock::boidInfo(bool print_header)
+{
+    if (print_header)
+    {
+        std::cout << "Boid ID, "  << "size, "
+                  << "position, " << "velocity"
+                  << std::endl;
+    }
+
     if (_boids && _boids->size() > 0 )
     {
         for (auto boid : *_boids)
         {
-            std::cout << boid.getID() << " "
-                    << boid.getSize() << " "
-                    << Flock::printVector(boid.getPosition())
-                    << Flock::printVector(boid.getVelocity())
-                    << std::endl;
+            Flock::boidInfo(boid);
         }
     }
     else 
@@ -52,12 +60,38 @@ void Flock::boidInfo()
     }
 }
 
+std::vector<double> Flock::computeMeanPosition()
+{
+    //
+    return {0,0};
+}
+
+std::vector<double> Flock::computeMeanHeading()
+{
+    //
+    return {0,0};
+}
+
 void Flock::evolveAgent(Agent& boid)
 {
-    // update position and velocity of each boid.
+    std::vector<double> mean_position = Flock::computeMeanPosition();
+    std::vector<double> mean_heading  = Flock::computeMeanHeading();
 }
 
 void Flock::runModel()
 {
     // Evolve boids in some fashion until termination criteria is reached.
+    int n = 0;
+
+    while (n < _maxRunSteps)
+    {
+        std::cout << "n = " << n << std::endl;
+        for (auto boid : *_boids)
+        {
+            Flock::evolveAgent(boid);
+            Flock::boidInfo(boid);
+        }
+        n++;
+    }
+    
 }
