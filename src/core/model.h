@@ -16,7 +16,6 @@ protected:
 
 public:
     // Random number within specified range
-    // FIXME: Make template.
     template <typename T>
     T getRandom(T min, T max);
 
@@ -29,8 +28,7 @@ public:
     virtual void setInitialData() = 0;
 
     // Evolve agents
-    // FIXME
-    //virtual void evolveAgent(Agent agent) = 0;
+    virtual void evolveAgent(Agent& agent) = 0;
 
     // Run simulation
     virtual void runModel() = 0;

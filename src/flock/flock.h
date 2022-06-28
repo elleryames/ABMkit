@@ -52,7 +52,7 @@ public:
 
     // inherited methods
     void setInitialData() override;
-    //void evolveAgent(Boid boid) override;
+    void evolveAgent(Agent& boid) override;
     void runModel() override;
 };
 

@@ -52,10 +52,10 @@ void Flock::boidInfo()
     }
 }
 
-// void Flock::evolveAgent(Boid boid)
-// {
-//     // update position and velocity of each boid.
-// }
+void Flock::evolveAgent(Agent& boid)
+{
+    // update position and velocity of each boid.
+}
 
 void Flock::runModel()
 {
