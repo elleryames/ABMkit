@@ -56,7 +56,10 @@ public:
     void boidInfo(bool print_header = false);
 
     // Methods for evolution of agents (boids)
-    std::vector<double> computeMeanPosition();
+    void updatePosition(Boid& boid);
+    void maintainSeparation(Boid& boid);
+    void updateVelocity(Boid& boid);
+    std::vector<double> computeLocalMeanPosition(Boid& boid);
     std::vector<double> computeMeanHeading();
 
     // inherited methods

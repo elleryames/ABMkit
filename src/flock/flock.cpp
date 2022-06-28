@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <algorithm>
+#include <math.h>
 #include "flock.h"
 
 Flock::Flock(int baseDim, int flockSize, double boidSize, int maxRunSteps) 
@@ -10,13 +12,15 @@ Flock::Flock(int baseDim, int flockSize, double boidSize, int maxRunSteps)
     _phaseSpace = std::make_shared< Domain >();
 };
 
+
+
 void Flock::setInitialData()
 {
     for (int i = 0; i < _flockSize; i++)
     {
         std::vector<double> pos = Flock::generateRandomArray(_phaseSpace->_sMin, _phaseSpace->_sMax);
         std::vector<double> vel = Flock::generateRandomArray(_phaseSpace->_vMin, _phaseSpace->_vMax);
-        _boids->emplace_back(Boid(pos, vel, _boidSize));
+        _boids->emplace_back(Boid(pos, vel));
     }
 }
 
@@ -32,9 +36,9 @@ void Flock::setPhaseSpace(  std::vector<double> sMin,
 void Flock::boidInfo(Boid& boid)
 {
     std::cout << boid.getID() << " "
-              << boid.getSize() << " "
-              << Flock::printVector(boid.getPosition())
-              << Flock::printVector(boid.getVelocity())
+              << boid.Size() << " "
+              << Flock::printVector(boid.Position())
+              << Flock::printVector(boid.Velocity())
               << std::endl;
 }
 
@@ -60,10 +64,79 @@ void Flock::boidInfo(bool print_header)
     }
 }
 
-std::vector<double> Flock::computeMeanPosition()
+/* Helper Functions for evolveAgent */
+// --------------------------------
+// Returns the scalar product of two vectors v1 and v2
+double scalarProduct(std::vector<double> v1, 
+                     std::vector<double> v2)
 {
-    //
-    return {0,0};
+    try
+    {
+        if (v1.size() == v2.size())
+        {
+            double sum = 0.0;
+            for (int i = 0; i< v1.size(); i++)
+            {
+                sum += v1[i] * v2[i];
+            }
+            return sum;
+        }
+        else
+        {
+            throw 1;
+        }
+    }
+    catch(const int& e)
+    {
+        std::cerr << "Vectors not the same size" << '\n';
+    }
+    return 0;
+}
+
+// Returns norm of a vector v
+double vectorNorm(std::vector<double>& v)
+{
+    std::cout << "... computing vector norm" << std::endl;
+    double v2 = scalarProduct(v, v);
+    return sqrt(v2);
+}
+
+// Returns angle in radians between vectors v1 and v2
+double computeAngleBetweenTwoVectors(std::vector<double> v1, 
+                                     std::vector<double> v2)
+{
+    double sp = scalarProduct(v1, v2);
+    double v1_norm = vectorNorm(v1);
+    double v2_norm = vectorNorm(v2);
+    return acos(sp/(v1_norm * v2_norm));
+}                            
+// --------------------------
+/* End Helper functions */
+
+std::vector<double> Flock::computeLocalMeanPosition(Boid& boid)
+{
+    std::cout << "Computing local mean position" 
+              << " boid id " << boid.getID() << std::endl;
+    // get current boids position
+    std::vector<double> bp = boid.Position();
+    // initialize local mean position and number of nearby boids.
+    std::vector<double> locMean(bp.size(), 0);
+    int numNearbyBoids = 0;
+    // loop thru boids, update local mean position if nearby
+    std::cout << "...looping through local boids" << std::endl;
+    for (auto oboid : *_boids)
+    {
+        std::cout << " oboid id " << oboid.getID() << std::endl;
+        // overwrite bp to bp-oboid.Position()
+        std::transform(bp.begin(), bp.end(), oboid.Position().begin(), bp.begin(), std::minus<>{});
+        if (vectorNorm(bp) < boid.perceptionRadius())
+        {
+            // locMean += oboid.Position();
+            std::transform(locMean.begin(), locMean.end(), oboid.Position().begin(), locMean.begin(), std::plus<>{});
+            numNearbyBoids++;
+        }
+    }
+    return locMean;
 }
 
 std::vector<double> Flock::computeMeanHeading()
@@ -72,10 +145,43 @@ std::vector<double> Flock::computeMeanHeading()
     return {0,0};
 }
 
-void Flock::evolveAgent(Agent& boid)
+void Flock::updatePosition(Boid& boid)
 {
-    std::vector<double> mean_position = Flock::computeMeanPosition();
-    std::vector<double> mean_heading  = Flock::computeMeanHeading();
+    std::cout << "Updating boid position" << std::endl;
+    std::vector<double> mean_position = Flock::computeLocalMeanPosition(boid);
+    std::vector<double> newPosition;
+    //newPosition = boid.Position() + boid.Sensitivity() * mean_position;
+    double bs = boid.Sensitivity();
+    std::transform(boid.Position().begin(), boid.Position().end(), mean_position.begin(), newPosition.begin(), [bs](double bp, double mp){ return bp + bs * mp; });
+    boid.Position(newPosition);
+}
+
+void Flock::maintainSeparation(Boid& boid)
+{
+    // 
+}
+
+void Flock::evolveAgent(Agent& aboid)
+{
+    // recast agent as boid
+    std::cout << "Dynamic casting" << std::endl;
+    Boid& boid = dynamic_cast<Boid&>(aboid);
+
+    // update position 
+    Flock::updatePosition(boid);
+
+    // maintain separation
+    // Flock::maintainSeparation(boid);
+
+    // update velocity 
+    // Flock::updateVelocity(boid);
+    // std::vector<double> mean_heading  = Flock::computeMeanHeading();
+    // /* rotate velocity vector by small angle in direction 
+    // of local mean heading */
+    // // compute angle
+    // double theta = computeAngleBetweenTwoVectors(boid.Velocity(), mean_heading)
+
+
 }
 
 void Flock::runModel()
