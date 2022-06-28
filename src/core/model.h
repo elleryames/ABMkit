@@ -14,6 +14,15 @@ class Model
 protected:
     int _baseDimension{2}; // base dimension of model
 
+    // Set initial configuration and state of agents
+    virtual void setInitialData() = 0;
+
+    // Evolve agents
+    virtual void evolveAgent(Agent& agent) = 0;
+
+    // Run simulation
+    virtual void runModel() = 0;
+
 public:
     // Random number within specified range
     template <typename T>
@@ -23,15 +32,6 @@ public:
     { 
         _baseDimension = bD; 
     }
-
-    // Set initial configuration and state of agents
-    virtual void setInitialData() = 0;
-
-    // Evolve agents
-    virtual void evolveAgent(Agent& agent) = 0;
-
-    // Run simulation
-    virtual void runModel() = 0;
 };
 
 template <typename T>
