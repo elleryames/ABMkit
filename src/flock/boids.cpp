@@ -1,7 +1,14 @@
 
 #include "boids.h"
 
+// Initialize number of boid agents
 int Boid::_numBoids = 0;
+
+// set static member variable defaults
+double Boid::_size = 0.1;
+double Boid::_sensitivity = 0.1;
+double Boid::_perceptionRadius = 0.5;
+double Boid::_bubbleRadius = 0.2;
 
 Boid::Boid(std::vector<double> pos, 
            std::vector<double> vel)
@@ -9,6 +16,10 @@ Boid::Boid(std::vector<double> pos,
     _id = _numBoids++;
     _position = pos;
     _velocity = vel;
+}
+
+void Boid::setBoidProperties(double boidSize, double boidSensitivity, double boidPerceptionRadius, double boidBubbleRadius)
+{
     _size = boidSize;
     _sensitivity = boidSensitivity;
     _perceptionRadius = boidPerceptionRadius;
@@ -52,11 +63,6 @@ std::vector<double> Boid::Velocity()
 }
 
 // Set functions
-void Boid::BoidCommonParameters(double bSize, double bSensitivity, double bPerceptionRad, double bBubbleRad);
-{
-    
-}
-
 void Boid::Position(std::vector<double>& p)
 {
     // FIXME: Check if within domain? (here or in flock)

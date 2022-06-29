@@ -14,10 +14,10 @@ class Boid : public Agent
 {
 private:
     static int _numBoids;
-    static double _size = 0.1;
-    static double _sensitivity = 0.1;
-    static double _perceptionRadius = 0.5;
-    static double _bubbleRadius = 0.2;
+    static double _size;
+    static double _sensitivity;
+    static double _perceptionRadius;
+    static double _bubbleRadius;
     // double _perceptionLength; // Radius of sphere percieved by boid
     std::vector<double> _position;
     std::vector<double> _velocity;
@@ -38,7 +38,7 @@ public:
     // set functions
     void Position(std::vector<double>& p);
     void Velocity(std::vector<double>& v);
-    void BoidCommonParameters(double bSize, double bSensitivity, double bPerceptionRad, double bBubbleRad);
+    void setBoidProperties(double bSize, double bSensitivity, double bPerceptionRad, double bBubbleRad);
 };
 
 #endif
