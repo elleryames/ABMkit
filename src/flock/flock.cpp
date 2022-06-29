@@ -36,7 +36,6 @@ void Flock::setPhaseSpace(  std::vector<double> sMin,
 void Flock::boidInfo(Boid& boid)
 {
     std::cout << boid.getID() << " "
-              << boid.Size() << " "
               << Flock::printVector(boid.Position())
               << Flock::printVector(boid.Velocity())
               << std::endl;
@@ -46,7 +45,7 @@ void Flock::boidInfo(bool print_header)
 {
     if (print_header)
     {
-        std::cout << "Boid ID, "  << "size, "
+        std::cout << "Boid ID, "
                   << "position, " << "velocity"
                   << std::endl;
     }
@@ -96,7 +95,6 @@ double scalarProduct(std::vector<double> v1,
 // Returns norm of a vector v
 double vectorNorm(std::vector<double>& v)
 {
-    std::cout << "... computing vector norm" << std::endl;
     double v2 = scalarProduct(v, v);
     return sqrt(v2);
 }
@@ -115,24 +113,21 @@ double computeAngleBetweenTwoVectors(std::vector<double> v1,
 
 std::vector<double> Flock::computeLocalMeanPosition(Boid& boid)
 {
-    std::cout << "Computing local mean position" 
-              << " boid id " << boid.getID() << std::endl;
     // get current boids position
     std::vector<double> bp = boid.Position();
     // initialize local mean position and number of nearby boids.
     std::vector<double> locMean(bp.size(), 0);
     int numNearbyBoids = 0;
     // loop thru boids, update local mean position if nearby
-    std::cout << "...looping through local boids" << std::endl;
     for (auto oboid : *_boids)
     {
-        std::cout << " oboid id " << oboid.getID() << std::endl;
         // overwrite bp to bp-oboid.Position()
-        std::transform(bp.begin(), bp.end(), oboid.Position().begin(), bp.begin(), std::minus<>{});
+        std::vector<double> obPosition = oboid.Position();
+        std::transform(bp.begin(), bp.end(), obPosition.begin(), bp.begin(), std::minus<>{});
         if (vectorNorm(bp) < boid.perceptionRadius())
         {
             // locMean += oboid.Position();
-            std::transform(locMean.begin(), locMean.end(), oboid.Position().begin(), locMean.begin(), std::plus<>{});
+            std::transform(locMean.begin(), locMean.end(), obPosition.begin(), locMean.begin(), std::plus<>{});
             numNearbyBoids++;
         }
     }
@@ -147,12 +142,12 @@ std::vector<double> Flock::computeMeanHeading()
 
 void Flock::updatePosition(Boid& boid)
 {
-    std::cout << "Updating boid position" << std::endl;
     std::vector<double> mean_position = Flock::computeLocalMeanPosition(boid);
-    std::vector<double> newPosition;
-    //newPosition = boid.Position() + boid.Sensitivity() * mean_position;
+    std::vector<double> newPosition (mean_position.size(), 0);
+    std::vector<double> bPosition = boid.Position();
     double bs = boid.Sensitivity();
-    std::transform(boid.Position().begin(), boid.Position().end(), mean_position.begin(), newPosition.begin(), [bs](double bp, double mp){ return bp + bs * mp; });
+    std::transform(bPosition.begin(), bPosition.end(), mean_position.begin(), newPosition.begin(), 
+    [bs](double bp, double mp){ return bp + bs * mp; });
     boid.Position(newPosition);
 }
 
@@ -164,7 +159,6 @@ void Flock::maintainSeparation(Boid& boid)
 void Flock::evolveAgent(Agent& aboid)
 {
     // recast agent as boid
-    std::cout << "Dynamic casting" << std::endl;
     Boid& boid = dynamic_cast<Boid&>(aboid);
 
     // update position 
@@ -194,6 +188,7 @@ void Flock::runModel()
         std::cout << "n = " << n << std::endl;
         for (auto boid : *_boids)
         {
+            std::cout << "  Updating boid " << boid.getID() << std::endl;
             Flock::evolveAgent(boid);
             Flock::boidInfo(boid);
         }
