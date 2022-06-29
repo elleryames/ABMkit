@@ -134,10 +134,30 @@ std::vector<double> Flock::computeLocalMeanPosition(Boid& boid)
     return locMean;
 }
 
-std::vector<double> Flock::computeMeanHeading()
+std::vector<double> Flock::computeLocalMeanHeading(Boid& boid)
 {
     //
-    return {0,0};
+    // get current boids position
+    std::vector<double> bp = boid.Position();
+    // initialize local mean position and number of nearby boids.
+    std::vector<double> locMean(bp.size(), 0);
+    int numNearbyBoids = 0;
+    // loop thru boids, update local mean position if nearby
+    for (auto oboid : *_boids)
+    {
+        // Test if oboid is nearby to current boid
+        // FIXME: make this into separate function.
+        // overwrite bp to bp-oboid.Position()
+        std::vector<double> obPosition = oboid.Position();
+        std::transform(bp.begin(), bp.end(), obPosition.begin(), bp.begin(), std::minus<>{});
+        if (vectorNorm(bp) < boid.perceptionRadius())
+        {
+            std::vector<double> obVelocity = oboid.Velocity();
+            std::transform(locMean.begin(), locMean.end(), obVelocity.begin(), locMean.begin(), std::plus<>{});
+            numNearbyBoids++;
+        }
+    }
+    return locMean;
 }
 
 void Flock::flockCohesion(Boid& boid)
@@ -145,12 +165,12 @@ void Flock::flockCohesion(Boid& boid)
     // compute mean position of nearby boids
     std::vector<double> meanPosition = Flock::computeLocalMeanPosition(boid);
 
-    // if any agents were in perceptionRadius of boid, then perform a cohesion update
-    double mpNorm = vectorNorm(meanPosition); // FIXME: norm is vanishing.
+    // if any agents were in perceptionRadius of boid, 
+    // then perform a cohesion update
+    double mpNorm = vectorNorm(meanPosition);
     if (mpNorm > 0)
     {
         std::vector<double> cohesionVelocity (meanPosition.size(), 0);
-        std::vector<double> bPosition = boid.Position();
         std::vector<double> bVelocity = boid.Velocity();
 
         double vMax = vectorNorm(Flock::_phaseSpace->_vMax); // max boid speed
@@ -166,6 +186,33 @@ void Flock::flockCohesion(Boid& boid)
         // update velocity
         std::transform(bVelocity.begin(), bVelocity.end(), 
         cohesionVelocity.begin(), bVelocity.begin(), std::plus<>{});
+        boid.Velocity(bVelocity);
+    }
+}
+
+void Flock::flockAlignment(Boid& boid)
+{
+    std::vector<double> meanVelocity = Flock::computeLocalMeanHeading(boid);
+
+    double mvNorm = vectorNorm(meanVelocity);
+    if (mvNorm > 0)
+    {
+        std::vector<double> alignmentVelocity (meanVelocity.size(), 0);
+        std::vector<double> bVelocity = boid.Velocity();
+
+        double vMax = vectorNorm(Flock::_phaseSpace->_vMax); // max boid speed
+        double bs = boid.Sensitivity(); // control how sensitive boid is
+
+        // alignmentVel = bs * vMax * meanVelocity
+        //      The boid cannot accelerate more than a fraction bs 
+        //      of the maximum boid speed.
+        std::transform(meanVelocity.begin(), meanVelocity.end(),
+            alignmentVelocity.begin(), 
+            [bs, vMax, mvNorm](double mv){ return bs * vMax * mv / mvNorm; });
+
+        // update velocity
+        std::transform(bVelocity.begin(), bVelocity.end(), 
+        alignmentVelocity.begin(), bVelocity.begin(), std::plus<>{});
         boid.Velocity(bVelocity);
     }
 }
@@ -193,6 +240,8 @@ void Flock::evolveAgent(Agent& aboid)
     //  update velocity
     // step 1. flock cohesion (move towards local center)
     Flock::flockCohesion(boid);
+    // step 2: velocity aligns with other boids
+    Flock::flockAlignment(boid);
 
     // update position 
     Flock::updatePosition(boid);
