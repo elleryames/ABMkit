@@ -241,15 +241,16 @@ void Flock::maintainSeparation(Boid& boid)
         if( isNearby(bPosition, oboid) )
         {
             // compute displacement from given position pos
-            //     displacement = bPosition - obPosition
+            //      = bPosition - obPosition
             std::vector<double> obPosition = oboid.Position();
             std::transform(bPosition.begin(), bPosition.end(), 
             obPosition.begin(), bPosition.begin(), std::minus<>{});
 
             // subtract from displacements vector
-            std::transform(displacements.begin(), displacements.end(), 
-            bPosition.begin(), displacements.begin(), std::minus<>{});
-        
+            if (vectorNorm(bPosition) < boid.bubbleRadius())
+            {
+                std::transform(displacements.begin(), displacements.end(), bPosition.begin(), displacements.begin(), std::minus<>{});
+            }
         }
     }
 
