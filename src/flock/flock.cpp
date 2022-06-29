@@ -100,8 +100,8 @@ double vectorNorm(const std::vector<double>& v)
 }
 
 // Returns angle in radians between vectors v1 and v2
-double computeAngleBetweenTwoVectors(std::vector<double> v1, 
-                                     std::vector<double> v2)
+double computeAngleBetweenTwoVectors(const std::vector<double>& v1, 
+                                     const std::vector<double>& v2)
 {
     double sp = scalarProduct(v1, v2);
     double v1_norm = vectorNorm(v1);
