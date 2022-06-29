@@ -36,8 +36,8 @@ public:
     std::vector<double> Velocity();
 
     // set functions
-    void Position(std::vector<double>& p);
-    void Velocity(std::vector<double>& v);
+    void Position(const std::vector<double>& p);
+    void Velocity(const std::vector<double>& v);
     void setBoidProperties(double bSize, double bSensitivity, double bPerceptionRad, double bBubbleRad);
 };
 

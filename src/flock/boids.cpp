@@ -63,14 +63,14 @@ std::vector<double> Boid::Velocity()
 }
 
 // Set functions
-void Boid::Position(std::vector<double>& p)
+void Boid::Position(const std::vector<double>& p)
 {
     // FIXME: Check if within domain? (here or in flock)
-    _position = p;
+    Boid::_position = p;
 }
 
-void Boid::Velocity(std::vector<double>& v)
+void Boid::Velocity(const std::vector<double>& v)
 {
     // FIXME: Verify within bounds
-    _velocity = v;
+    Boid::_velocity = v;
 }
