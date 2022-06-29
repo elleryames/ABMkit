@@ -107,7 +107,21 @@ double computeAngleBetweenTwoVectors(std::vector<double> v1,
     double v1_norm = vectorNorm(v1);
     double v2_norm = vectorNorm(v2);
     return acos(sp/(v1_norm * v2_norm));
-}                            
+}     
+
+bool isNearby(std::vector<double>& pos, Boid& boid)
+{
+    // get boids position
+    std::vector<double> obPosition = boid.Position();
+
+    // compute displacement from given position pos
+    std::transform(pos.begin(), pos.end(), 
+    obPosition.begin(), pos.begin(), std::minus<>{});
+
+    // test if within perception radius 
+    // Note: perceptionRadius is static. 
+    return vectorNorm(pos) < boid.perceptionRadius();
+}
 // --------------------------
 /* End Helper functions */
 
@@ -121,12 +135,10 @@ std::vector<double> Flock::computeLocalMeanPosition(Boid& boid)
     // loop thru boids, update local mean position if nearby
     for (auto oboid : *_boids)
     {
-        // overwrite bp to bp-oboid.Position()
-        std::vector<double> obPosition = oboid.Position();
-        std::transform(bp.begin(), bp.end(), obPosition.begin(), bp.begin(), std::minus<>{});
-        if (vectorNorm(bp) < boid.perceptionRadius())
+        // if oboid is nearby
+        if (isNearby(bp, oboid))
         {
-            // locMean += oboid.Position();
+            std::vector<double> obPosition = oboid.Position();
             std::transform(locMean.begin(), locMean.end(), obPosition.begin(), locMean.begin(), std::plus<>{});
             numNearbyBoids++;
         }
@@ -146,11 +158,7 @@ std::vector<double> Flock::computeLocalMeanHeading(Boid& boid)
     for (auto oboid : *_boids)
     {
         // Test if oboid is nearby to current boid
-        // FIXME: make this into separate function.
-        // overwrite bp to bp-oboid.Position()
-        std::vector<double> obPosition = oboid.Position();
-        std::transform(bp.begin(), bp.end(), obPosition.begin(), bp.begin(), std::minus<>{});
-        if (vectorNorm(bp) < boid.perceptionRadius())
+        if (isNearby(bp, oboid))
         {
             std::vector<double> obVelocity = oboid.Velocity();
             std::transform(locMean.begin(), locMean.end(), obVelocity.begin(), locMean.begin(), std::plus<>{});
@@ -217,6 +225,40 @@ void Flock::flockAlignment(Boid& boid)
     }
 }
 
+void Flock::maintainSeparation(Boid& boid)
+{
+    // Based on pseudocode from Conrad Parker
+    // https://vergenet.net/~conrad/boids/pseudocode.html
+
+    std::vector<double> bPosition = boid.Position();
+    std::vector<double> bVelocity = boid.Velocity();
+    std::vector<double> displacements (bPosition.size(), 0);
+
+    //
+    for (auto oboid : *_boids)
+    {
+        // if oboid is nearby to current boid
+        if( isNearby(bPosition, oboid) )
+        {
+            // compute displacement from given position pos
+            //     displacement = bPosition - obPosition
+            std::vector<double> obPosition = oboid.Position();
+            std::transform(bPosition.begin(), bPosition.end(), 
+            obPosition.begin(), bPosition.begin(), std::minus<>{});
+
+            // subtract from displacements vector
+            std::transform(displacements.begin(), displacements.end(), 
+            bPosition.begin(), displacements.begin(), std::minus<>{});
+        
+        }
+    }
+
+    // update velocity
+    std::transform(bVelocity.begin(), bVelocity.end(), 
+    displacements.begin(), bVelocity.begin(), std::plus<>{});
+    boid.Velocity(bVelocity);
+}
+
 void Flock::updatePosition(Boid& boid)
 {
     std::vector<double> bPosition = boid.Position();
@@ -227,10 +269,6 @@ void Flock::updatePosition(Boid& boid)
     boid.Position(newPosition);
 }
 
-void Flock::maintainSeparation(Boid& boid)
-{
-    // 
-}
 
 void Flock::evolveAgent(Agent& aboid)
 {
@@ -242,22 +280,11 @@ void Flock::evolveAgent(Agent& aboid)
     Flock::flockCohesion(boid);
     // step 2: velocity aligns with other boids
     Flock::flockAlignment(boid);
+    // step 3: maintain separation (steer to avoid other boids)
+    Flock::maintainSeparation(boid);
 
     // update position 
     Flock::updatePosition(boid);
-
-    // maintain separation
-    //Flock::maintainSeparation(boid);
-
-    // update velocity 
-    // Flock::updateVelocity(boid);
-    // std::vector<double> mean_heading  = Flock::computeMeanHeading();
-    // /* rotate velocity vector by small angle in direction 
-    // of local mean heading */
-    // // compute angle
-    // double theta = computeAngleBetweenTwoVectors(boid.Velocity(), mean_heading)
-
-
 }
 
 void Flock::runModel()
