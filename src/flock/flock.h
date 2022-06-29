@@ -57,6 +57,7 @@ public:
 
     // Methods for evolution of agents (boids)
     void updatePosition(Boid& boid);
+    void flockCohesion(Boid& boid);
     void maintainSeparation(Boid& boid);
     void updateVelocity(Boid& boid);
     std::vector<double> computeLocalMeanPosition(Boid& boid);

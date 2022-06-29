@@ -74,7 +74,7 @@ double scalarProduct(std::vector<double> v1,
         if (v1.size() == v2.size())
         {
             double sum = 0.0;
-            for (int i = 0; i< v1.size(); i++)
+            for (int i = 0; i < v1.size(); i++)
             {
                 sum += v1[i] * v2[i];
             }
@@ -93,7 +93,7 @@ double scalarProduct(std::vector<double> v1,
 }
 
 // Returns norm of a vector v
-double vectorNorm(std::vector<double>& v)
+double vectorNorm(const std::vector<double>& v)
 {
     double v2 = scalarProduct(v, v);
     return sqrt(v2);
@@ -140,14 +140,43 @@ std::vector<double> Flock::computeMeanHeading()
     return {0,0};
 }
 
+void Flock::flockCohesion(Boid& boid)
+{ 
+    // compute mean position of nearby boids
+    std::vector<double> meanPosition = Flock::computeLocalMeanPosition(boid);
+
+    // if any agents were in perceptionRadius of boid, then perform a cohesion update
+    double mpNorm = vectorNorm(meanPosition); // FIXME: norm is vanishing.
+    if (mpNorm > 0)
+    {
+        std::vector<double> cohesionVelocity (meanPosition.size(), 0);
+        std::vector<double> bPosition = boid.Position();
+        std::vector<double> bVelocity = boid.Velocity();
+
+        double vMax = vectorNorm(Flock::_phaseSpace->_vMax); // max boid speed
+        double bs = boid.Sensitivity(); // control how sensitive boid is
+
+        // cohesionVel = bs * vMax * meanPosition
+        // The boid cannot accelerate more than a fraction bs 
+        // of the maximum boid speed.
+        std::transform(meanPosition.begin(), meanPosition.end(),
+            cohesionVelocity.begin(), 
+            [bs, vMax, mpNorm](double mp){ return bs * vMax * mp / mpNorm; });
+
+        // update velocity
+        std::transform(bVelocity.begin(), bVelocity.end(), 
+        cohesionVelocity.begin(), bVelocity.begin(), std::plus<>{});
+        boid.Velocity(bVelocity);
+    }
+}
+
 void Flock::updatePosition(Boid& boid)
 {
-    std::vector<double> mean_position = Flock::computeLocalMeanPosition(boid);
-    std::vector<double> newPosition (mean_position.size(), 0);
     std::vector<double> bPosition = boid.Position();
-    double bs = boid.Sensitivity();
-    std::transform(bPosition.begin(), bPosition.end(), mean_position.begin(), newPosition.begin(), 
-    [bs](double bp, double mp){ return bp + bs * mp; });
+    std::vector<double> bVelocity = boid.Velocity();
+    std::vector<double> newPosition (bPosition.size(), 0);
+    // pnew = p + v dt, where dt = 1.
+    std::transform(bPosition.begin(), bPosition.end(), bVelocity.begin(), newPosition.begin(), std::plus<>{});
     boid.Position(newPosition);
 }
 
@@ -161,11 +190,15 @@ void Flock::evolveAgent(Agent& aboid)
     // recast agent as boid
     Boid& boid = dynamic_cast<Boid&>(aboid);
 
+    //  update velocity
+    // step 1. flock cohesion (move towards local center)
+    Flock::flockCohesion(boid);
+
     // update position 
     Flock::updatePosition(boid);
 
     // maintain separation
-    // Flock::maintainSeparation(boid);
+    //Flock::maintainSeparation(boid);
 
     // update velocity 
     // Flock::updateVelocity(boid);
@@ -186,13 +219,14 @@ void Flock::runModel()
     while (n < _maxRunSteps)
     {
         std::cout << "n = " << n << std::endl;
-        for (auto boid : *_boids)
+        for (Boid& boid : *_boids)
         {
             std::cout << "  Updating boid " << boid.getID() << std::endl;
             Flock::evolveAgent(boid);
             Flock::boidInfo(boid);
         }
         n++;
+
     }
     
 }
