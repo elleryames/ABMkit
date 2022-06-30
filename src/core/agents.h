@@ -15,6 +15,9 @@ protected:
 public:
     int getID() { return _id; }
 
+    // virtual destructor makes agent polymorphic
+    virtual ~Agent() = default;
+
     // run: interaction between agent and other agents.
     // pure virtual method, must be overwritten by derived classes for specific agents. 
     // virtual void run() = 0;

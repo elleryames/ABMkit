@@ -2,6 +2,9 @@
     An agent class
 */ 
 
+#ifndef BOIDS_H
+#define BOIDS_H
+
 #include <vector>
 
 #include "agents.h"
@@ -11,17 +14,31 @@ class Boid : public Agent
 {
 private:
     static int _numBoids;
-    double _size;
+    static double _size;
+    static double _sensitivity;
+    static double _perceptionRadius;
+    static double _bubbleRadius;
+    // double _perceptionLength; // Radius of sphere percieved by boid
     std::vector<double> _position;
     std::vector<double> _velocity;
 
 public:
     Boid(std::vector<double> position, 
-         std::vector<double> velocity, 
-         double size);
+         std::vector<double> velocity);
 
-    double getSize();
-    std::vector<double> getPosition();
-    std::vector<double> getVelocity();
-    int getNumBoids();
+    // get functions
+    double Size();
+    int NumBoids();
+    double Sensitivity();
+    double perceptionRadius();
+    double bubbleRadius();
+    std::vector<double> Position();
+    std::vector<double> Velocity();
+
+    // set functions
+    void Position(const std::vector<double>& p);
+    void Velocity(const std::vector<double>& v);
+    void setBoidProperties(double bSize, double bSensitivity, double bPerceptionRad, double bBubbleRad);
 };
+
+#endif
