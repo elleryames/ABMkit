@@ -35,8 +35,8 @@ void Flock::setPhaseSpace(  std::vector<double> sMin,
 
 void Flock::boidInfo(Boid& boid)
 {
-    std::cout << "  " << boid.getID() << " "
-              << Flock::printVector(boid.Position())
+    std::cout << "  " << boid.getID() << ", "
+              << Flock::printVector(boid.Position()) << ", "
               << Flock::printVector(boid.Velocity())
               << std::endl;
 }
@@ -109,6 +109,7 @@ double computeAngleBetweenTwoVectors(const std::vector<double>& v1,
     return acos(sp/(v1_norm * v2_norm));
 }     
 
+// Tests whether Boid boid is within the perception Radius of position pos.
 bool isNearby(std::vector<double>& pos, Boid& boid)
 {
     // get boids position

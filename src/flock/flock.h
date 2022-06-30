@@ -60,7 +60,6 @@ public:
     void flockCohesion(Boid& boid);
     void flockAlignment(Boid& boid);
     void maintainSeparation(Boid& boid);
-    void updateVelocity(Boid& boid);
     std::vector<double> computeLocalMeanPosition(Boid& boid);
     std::vector<double> computeLocalMeanHeading(Boid& boid);
 
