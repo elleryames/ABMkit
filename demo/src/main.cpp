@@ -19,6 +19,7 @@ int main()
     myFlock.setInitialData();
     myFlock.boidInfo(true);
     myFlock.runModel();
+    myFlock.boidInfo(true);
 
     return 0;
 }
