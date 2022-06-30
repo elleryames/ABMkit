@@ -35,7 +35,7 @@ void Flock::setPhaseSpace(  std::vector<double> sMin,
 
 void Flock::boidInfo(Boid& boid)
 {
-    std::cout << boid.getID() << " "
+    std::cout << "  " << boid.getID() << " "
               << Flock::printVector(boid.Position())
               << Flock::printVector(boid.Velocity())
               << std::endl;
@@ -295,7 +295,7 @@ void Flock::runModel()
 
     while (n < _maxRunSteps)
     {
-        std::cout << "n = " << n << std::endl;
+        std::cout << "Time step n = " << n << std::endl;
         for (Boid& boid : *_boids)
         {
             std::cout << "  Updating boid " << boid.getID() << std::endl;
